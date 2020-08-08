@@ -17,7 +17,7 @@ def static(path):
 def root():
     return template("index")
 
-# curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"num":"0", "onoff":true}' http://192.168.1.88:8080/setLed
+#curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"num":"0", "onoff":true}' http://IP/setLed
 @route('/setLed', method='POST')
 def setLedEntry():
     #var = request.json
