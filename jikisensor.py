@@ -1,3 +1,5 @@
+#確認用
+
 import time
 import RPi.GPIO as GPIO
 

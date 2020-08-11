@@ -1,6 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 
+#確認
 #set BCM_GPIO 18(GPIO1) as LED pin
 LEDPIN = 18
 
