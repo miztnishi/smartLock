@@ -5,9 +5,9 @@ from bottle import route, run, request, HTTPResponse, template, static_file
 import RPi.GPIO as GPIO
 import atexit
 import time
-import piServo
+import pi_servo
+import send_line
 
-GPIO_PORT_LED_0 = 18
 
 @route('/static/:path#.+#', name='static')
 def static(path):
@@ -17,26 +17,49 @@ def static(path):
 def root():
     return template("index")
 
-#curl -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{"num":"0", "onoff":true}' http://IP/setLed
-@route('/setLed', method='POST')
-def setLedEntry():
-    #var = request.json
-    #GPIO.output(GPIO_PORT_LED_0, 1)
-    print('POST完了')
-    piservo = piServo.pi_servo()
-    piservo.moveRight()
-     #GPIO.output(GPIO_PORT_LED_0, 0)
-    retBody = {"ret": "ok"}
-    r = HTTPResponse(status=200, body=retBody)
+@route('/openDoor', method='POST')
+def open_door():
+    sendline = send_line.SendLine()
+    try:
+        piservo = pi_servo.PiServo()
+        piservo.move_open()
+        sendline.send("アプリからドアを開けました")
+        retBody = {"ret": "ok"}
+        r = HTTPResponse(status=200, body=retBody)
+
+    except Exception as e:
+        errMsg = "異常終了です:" + str(e)
+        sendline.send(errMsg)
+        retBody = {"ret": "NG:" + str(e)}
+        r = HTTPResponse(status=500, body=retBody)
+
     r.set_header('Content-Type', 'application/json')
     return r
+
+@route('/closeDoor', method='POST')
+def open_door():
+    sendline = send_line.SendLine()
+    try:
+        piservo = pi_servo.PiServo()
+        piservo.move_close()
+        sendline.send("アプリからドアを閉めました")
+        retBody = {"ret": "ok"}
+        r = HTTPResponse(status=200, body=retBody)
+
+    except Exception as e:
+        errMsg = "異常終了です:" + str(e)
+        sendline.send(errMsg)
+        retBody = {"ret": "NG:" + str(e)}
+        r = HTTPResponse(status=500, body=retBody)
+
+    r.set_header('Content-Type', 'application/json')
+    return r
+
+
 
 def main():
     print("Initialize port")
     GPIO.setmode(GPIO.BCM)
-    GPIO.setup(GPIO_PORT_LED_0, GPIO.OUT)
-    GPIO.output(GPIO_PORT_LED_0, 0)
-
     print('Server Start')
     run(host='0.0.0.0', port=8080, debug=True, reloader=True)
     # run(host='0.0.0.0', port=8080, debug=False, reloader=False)
